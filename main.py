@@ -12,7 +12,7 @@ snail_speed = 4
 sky_surf = pygame.image.load('./graphics/Sky.png').convert()
 ground_surf = pygame.image.load('./graphics/ground.png').convert()
 
-title_surf = font_test.render('Runner', False, 'Black')
+title_surf = font_test.render('Runner', False, (64, 64, 64))
 title_rect = title_surf.get_rect(center=(400, 50))
 
 snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
@@ -34,11 +34,11 @@ while True:
     screen.blit(sky_surf, (0, 0))
     screen.blit(ground_surf, (0, 300))
 
-    pygame.draw.rect(screen, 'Pink', title_rect)
-    pygame.draw.rect(screen, 'Pink', title_rect, 10)
+    pygame.draw.rect(screen, '#C0E8EC', title_rect)
+    pygame.draw.rect(screen, '#C0E8EC', title_rect, 10)
     screen.blit(title_surf, title_rect)
 
-    screen.blit(speed_surf, (350, 70))
+    screen.blit(speed_surf, (340, 70))
 
     snail_rec.x -= 4
     if snail_rec.right <= 0:
