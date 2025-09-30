@@ -18,17 +18,22 @@ title_rect = title_surf.get_rect(center=(400, 50))
 snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
 snail_rec = snail_surf.get_rect(midbottom=(800, 300))
 
+# Player
 player_surf = pygame.image.load('./graphics/Player/player_walk_1.png').convert_alpha()
-player_rec = player_surf.get_rect(midbottom=(80, 300))
+player_rect = player_surf.get_rect(midbottom=(80, 300))
+player_gravity = 0
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        if event.type == pygame.MOUSEMOTION:
-            if player_rec.collidepoint(event.pos):
-                print('collision')
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and player_rect.bottom == 300:
+                player_gravity = -12
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if player_rect.collidepoint(event.pos) and player_rect.bottom == 300:
+                player_gravity = -12
 
     speed_surf = font_test.render('Speed: ' + str(round(snail_speed, 2)), False, 'Black')
     screen.blit(sky_surf, (0, 0))
@@ -45,15 +50,18 @@ while True:
         snail_rec.left = 800
         snail_speed += 0.1
     screen.blit(snail_surf, snail_rec)
-    screen.blit(player_surf, player_rec)
 
-    # if player_rec.colliderect(snail_rec):
-    #     print("collision")
+    # Player
+    player_gravity += 0.5
+    player_rect.y += player_gravity
+    if player_rect.bottom >= 300:
+        player_rect.bottom = 300
 
-    # mouse_pos = pygame.mouse.get_pos()
-    # if player_rec.collidepoint(mouse_pos):
-    #     if pygame.mouse.get_pressed()[0]:
-    #         print("collision")
+    if player_rect.colliderect(snail_rec):
+        pygame.quit()
+        exit()
+
+    screen.blit(player_surf, player_rect)
 
     pygame.display.update()
     clock.tick(60)
