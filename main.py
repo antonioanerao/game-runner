@@ -11,27 +11,34 @@ font_test = pygame.font.Font('./font/Pixeltype.ttf', size=50)
 snail_speed = 4
 sky_surf = pygame.image.load('./graphics/Sky.png').convert()
 ground_surf = pygame.image.load('./graphics/ground.png').convert()
-text_surf = font_test.render('Runner', False, 'Black')
+
+title_surf = font_test.render('Runner', False, 'Black')
+title_rect = title_surf.get_rect(center=(400, 50))
 
 snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
 snail_rec = snail_surf.get_rect(midbottom=(800, 300))
 
-
 player_surf = pygame.image.load('./graphics/Player/player_walk_1.png').convert_alpha()
 player_rec = player_surf.get_rect(midbottom=(80, 300))
-
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.MOUSEMOTION:
+            if player_rec.collidepoint(event.pos):
+                print('collision')
 
     speed_surf = font_test.render('Speed: ' + str(round(snail_speed, 2)), False, 'Black')
     screen.blit(sky_surf, (0, 0))
     screen.blit(ground_surf, (0, 300))
-    screen.blit(text_surf, (350, 50))
-    screen.blit(speed_surf, (350, 80))
+
+    pygame.draw.rect(screen, 'Pink', title_rect)
+    pygame.draw.rect(screen, 'Pink', title_rect, 10)
+    screen.blit(title_surf, title_rect)
+
+    screen.blit(speed_surf, (350, 70))
 
     snail_rec.x -= 4
     if snail_rec.right <= 0:
@@ -40,8 +47,13 @@ while True:
     screen.blit(snail_surf, snail_rec)
     screen.blit(player_surf, player_rec)
 
-    if player_rec.colliderect(snail_rec):
-        print("collision")
+    # if player_rec.colliderect(snail_rec):
+    #     print("collision")
+
+    # mouse_pos = pygame.mouse.get_pos()
+    # if player_rec.collidepoint(mouse_pos):
+    #     if pygame.mouse.get_pressed()[0]:
+    #         print("collision")
 
     pygame.display.update()
     clock.tick(60)
