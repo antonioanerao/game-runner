@@ -9,6 +9,7 @@ clock = pygame.time.Clock()
 custom_font = pygame.font.Font('./font/Pixeltype.ttf', size=50)
 
 game_active = True
+run_count = 0
 
 snail_speed = 4
 sky_surf = pygame.image.load('./graphics/Sky.png').convert()
@@ -25,25 +26,43 @@ player_surf = pygame.image.load('./graphics/Player/player_walk_1.png').convert_a
 player_rect = player_surf.get_rect(midbottom=(80, 300))
 player_gravity = 0
 
+# Game Over
+game_over_surf = pygame.image.load('./graphics/game_over1.png').convert_alpha()
+game_over_surf = pygame.transform.scale(game_over_surf, (800, 400))
+restart_info = custom_font.render("Press 1 to Restart", False, 'Yellow')
+
+# Game Start
+game_start_surf = pygame.image.load('./graphics/game_start.png').convert_alpha()
+game_start_surf = pygame.transform.scale(game_start_surf, (800, 400))
+start_info = custom_font.render("Press 1 to START", False, 'Yellow')
+start_info_rect = start_info.get_rect(midtop=(400, 10))
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and player_rect.bottom == 300:
-                player_gravity = -12.5
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if player_rect.collidepoint(event.pos) and player_rect.bottom == 300:
-                player_gravity = -12.5
 
-        if game_active is False and event.type == pygame.KEYDOWN and event.key == pygame.K_1:
-            snail_rec.left = 800
-            game_active = True
-            snail_speed = 4
-            print("Game Restarted")
+        if run_count == 0:
+            screen.blit(game_start_surf, (0, 0))
+            screen.blit(start_info, (start_info_rect))
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
+                run_count = 1
 
-    if game_active:
+        if game_active and run_count == 1:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and player_rect.bottom == 300:
+                    player_gravity = -12.5
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if player_rect.collidepoint(event.pos) and player_rect.bottom == 300:
+                    player_gravity = -12.5
+        else:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
+                snail_rec.left = 800
+                game_active = True
+                snail_speed = 4
+
+    if game_active and run_count == 1:
         speed_surf = custom_font.render('Speed: ' + str(round(snail_speed - 3, 2)), False, 'Black')
         screen.blit(sky_surf, (0, 0))
         screen.blit(ground_surf, (0, 300))
@@ -70,14 +89,11 @@ while True:
 
         if player_rect.colliderect(snail_rec):
             game_active = False
-            print("Game Over")
 
-    else:
-        game_over_surf = pygame.image.load('./graphics/game_over1.png').convert_alpha()
-        game_over_surf = pygame.transform.scale(game_over_surf, (800, 400))
+    if game_active is False:
         screen.blit(game_over_surf, (0, 0))
-        restart_info = custom_font.render("Press 1 to Restart", False, 'Yellow')
         screen.blit(restart_info, (250, 20))
+
         if snail_speed == 4:
             score_info = custom_font.render('Speed Record: 1. You suck', False, 'Yellow')
             screen.blit(score_info, (200, 350))
