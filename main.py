@@ -30,12 +30,12 @@ while True:
             exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and player_rect.bottom == 300:
-                player_gravity = -12
+                player_gravity = -12.5
         if event.type == pygame.MOUSEBUTTONDOWN:
             if player_rect.collidepoint(event.pos) and player_rect.bottom == 300:
-                player_gravity = -12
+                player_gravity = -12.5
 
-    speed_surf = font_test.render('Speed: ' + str(round(snail_speed, 2)), False, 'Black')
+    speed_surf = font_test.render('Speed: ' + str(round(snail_speed - 3, 2)), False, 'Black')
     screen.blit(sky_surf, (0, 0))
     screen.blit(ground_surf, (0, 300))
 
@@ -45,10 +45,10 @@ while True:
 
     screen.blit(speed_surf, (340, 70))
 
-    snail_rec.x -= 4
+    snail_rec.x -= snail_speed
     if snail_rec.right <= 0:
         snail_rec.left = 800
-        snail_speed += 0.1
+        snail_speed += 0.5
     screen.blit(snail_surf, snail_rec)
 
     # Player
