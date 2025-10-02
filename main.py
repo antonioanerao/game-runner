@@ -20,6 +20,14 @@ def obstacle_movement(obstacle_list):
         return []
 
 
+def collision(player, obstacles):
+    if obstacles:
+        for obstacle_rect in obstacles:
+            if player.colliderect(obstacle_rect):
+                return False
+    return True
+
+
 pygame.init()
 
 screen = pygame.display.set_mode((800, 400))
@@ -120,6 +128,8 @@ while True:
 
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
 
+        # collision
+        game_active = collision(player_rect, obstacle_rect_list)
         screen.blit(player_surf, player_rect)
 
         # if player_rect.colliderect(snail_rec):
@@ -132,9 +142,15 @@ while True:
         if snail_speed == 4:
             score_info = custom_font.render('Speed Record: 1. You suck', False, 'Yellow')
             screen.blit(score_info, (200, 350))
+            player_rect.midbottom = (80, 300)
+            player_gravity = 0
+            obstacle_rect_list.clear()
         else:
             score_info = custom_font.render('Speed Record: ' + str(round(snail_speed - 3, 2)), False, 'Yellow')
             screen.blit(score_info, (280, 350))
+            player_rect.midbottom = (80, 300)
+            player_gravity = 0
+            obstacle_rect_list.clear()
 
     pygame.display.update()
     clock.tick(60)
