@@ -121,25 +121,8 @@ obstacle_group = pygame.sprite.Group()
 game_active = True
 run_count = 0
 
-snail_speed = 4
 sky_surf = pygame.image.load('./graphics/Sky.png').convert()
 ground_surf = pygame.image.load('./graphics/ground.png').convert()
-
-# Obstables
-snail_surf = pygame.image.load('./graphics/snail/snail1.png').convert_alpha()
-fly_surf = pygame.image.load('./graphics/Fly/Fly1.png').convert_alpha()
-
-obstacle_rect_list = []
-
-# Player
-player_walk_1 = pygame.image.load('./graphics/Player/player_walk_1.png').convert_alpha()
-player_walk_2 = pygame.image.load('./graphics/Player/player_walk_2.png').convert_alpha()
-player_walk = [player_walk_1, player_walk_2]
-player_index = 0
-player_jump = pygame.image.load('./graphics/Player/jump.png').convert_alpha()
-player_surf = player_walk[player_index]
-player_rect = player_surf.get_rect(midbottom=(80, 300))
-player_gravity = 0
 
 # Game Over
 game_over_surf = pygame.image.load('./graphics/game_over1.png').convert_alpha()
@@ -153,9 +136,8 @@ start_info = custom_font.render("Press 1 to START", False, 'Yellow')
 start_info_rect = start_info.get_rect(midtop=(400, 10))
 
 # Timer
-
 obstacle_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(obstacle_timer, 900)
+pygame.time.set_timer(obstacle_timer, 1200)
 
 while True:
     for event in pygame.event.get():
@@ -169,21 +151,12 @@ while True:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
                 run_count = 1
 
-        if game_active and run_count == 1:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and player_rect.bottom == 300:
-                    player_gravity = -13.5
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if player_rect.collidepoint(event.pos) and player_rect.bottom == 300:
-                    player_gravity = -13.5
+        if event.type == obstacle_timer and game_active and run_count == 1:
+            obstacle_group.add(Obstacle(choice(['fly', 'snail', 'snail', 'snail'])))
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_1:
                 game_active = True
-                snail_speed = 4
                 start_time = int(pygame.time.get_ticks() / 1000)
-
-        if event.type == obstacle_timer and game_active and run_count == 1:
-            obstacle_group.add(Obstacle(choice(['fly', 'snail', 'snail', 'snail'])))
 
     if game_active and run_count == 1:
         screen.blit(sky_surf, (0, 0))
@@ -204,9 +177,6 @@ while True:
 
         score_info = custom_font.render('Your Score: ' + str(score), False, 'Yellow')
         screen.blit(score_info, (280, 350))
-        player_rect.midbottom = (80, 300)
-        player_gravity = 0
-        obstacle_rect_list.clear()
 
     pygame.display.update()
     clock.tick(60)
