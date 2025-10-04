@@ -1,22 +1,58 @@
-from sys import exit
+import sys
 import pygame
 from random import randint, choice
+import os
+
+user_name = input("What is your name? ")
+
+
+def load_images(path, prefix, count, scale=2):
+    """Carrega uma sequência de imagens numeradas de uma pasta.
+
+    Args:
+        path (str): pasta onde estão as imagens.
+        prefix (str): prefixo do nome do arquivo (ex: "walk" para walk1.png, walk2.png...).
+        count (int): número de imagens a carregar.
+        scale (int): fator de escala (2 = scale2x).
+
+    Returns:
+        list: lista de Surfaces já carregadas e escaladas.
+    """
+    images = []
+    for i in range(1, count + 1):
+        img_path = os.path.join(path, f"{prefix}{i}.png")
+        image = pygame.image.load(img_path).convert_alpha()
+        if scale == 2:
+            image = pygame.transform.scale2x(image)
+        elif scale != 1:
+            w, h = image.get_size()
+            image = pygame.transform.scale(image, (w * scale, h * scale))
+        images.append(image)
+    return images
+
+
+def resource_path(relative_path):
+    """Acha o caminho para recursos no dev e no executável"""
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        player_walk_1 = pygame.image.load('./graphics/Player/player_walk_1.png').convert_alpha()
-        player_walk_2 = pygame.image.load('./graphics/Player/player_walk_2.png').convert_alpha()
-
         self.player_index = 0
-        self.player_walk = [player_walk_1, player_walk_2]
-        self.player_jump = pygame.image.load('./graphics/Player/jump.png').convert_alpha()
+        self.player_jumping_index = 0
+        self.gravity = 0
+        self.player_walk = load_images('./graphics/Girl/walking', 'walk', 12, scale=1)
+        self.player_jumping = load_images('./graphics/Girl/jumping', 'jumping', 4, scale=1)
 
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom=(80, 300))
-        self.gravity = 0
+        self.player_jump = self.player_jumping[self.player_jumping_index]
 
         self.jump_sound = pygame.mixer.Sound('./audio/jump.mp3')
         self.jump_sound.set_volume(0.1)
@@ -24,7 +60,7 @@ class Player(pygame.sprite.Sprite):
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
-            self.gravity = -20
+            self.gravity = -16
             self.jump_sound.play()
 
     def apply_gravity(self):
@@ -36,9 +72,12 @@ class Player(pygame.sprite.Sprite):
 
     def player_animation(self):
         if self.rect.bottom < 300:
-            self.image = self.player_jump
+            self.player_jumping_index += 0.15
+            if self.player_jumping_index >= len(self.player_jumping):
+                self.player_jumping_index = len(self.player_jumping) - 1
+            self.image = self.player_jumping[int(self.player_jumping_index)]
         else:
-            self.player_index += 0.1
+            self.player_index += 0.25
             if self.player_index >= len(self.player_walk):
                 self.player_index = 0
             self.image = self.player_walk[int(self.player_index)]
@@ -105,7 +144,8 @@ pygame.init()
 screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption('Runner')
 clock = pygame.time.Clock()
-custom_font = pygame.font.Font('./font/Pixeltype.ttf', size=50)
+font_path = resource_path('./font/Pixeltype.ttf')
+custom_font = pygame.font.Font(font_path, size=50)
 start_time = 0
 score = 0
 
@@ -175,8 +215,10 @@ while True:
         screen.blit(game_over_surf, (0, 0))
         screen.blit(restart_info, (250, 20))
 
+        player_name = custom_font.render('Hello ' + str(user_name), False, 'Yellow')
         score_info = custom_font.render('Your Score: ' + str(score), False, 'Yellow')
-        screen.blit(score_info, (280, 350))
+        screen.blit(player_name, (280, 340))
+        screen.blit(score_info, (280, 370))
 
     pygame.display.update()
     clock.tick(60)
